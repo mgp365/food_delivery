@@ -97,6 +97,20 @@ void mergeSort(T *A, int l, int r){
 } // fin de ordenamiento por merge
 
 
+// Algoritmo de búsqueda binaria
+template <class T>
+int binaria(T *A, Item s, int n){
+    int l = 0, r = n-1, i; // left y right para orientaarnos
+    while(l <= r){
+        i = l + (r-l) / 2; // definir i como la mitad
+        if(A[i].fecha() == s) return i; 
+        else if(A[i].fecha() < s) l = i+1; // deliminar del lado izquierdo
+        else r = i-1; // delimitar de lado derecho
+    }
+    return -1;
+}
+
+
 // declarar componentes de array según el txt
 template <class T>
 void declare(T *A){
@@ -161,6 +175,15 @@ void declare(T *A){
 }
 
 
+template <class T>
+void rango(T *A){
+    string inicio, final;
+    cout << "--- Rango de fechas a buscar ---" << endl;
+    cout << "Ingrese la fecha de inicio: "; cin >> inicio;
+    cout << "Ingrese la fecha de final: "; cin >> final;
+}
+
+
 int main(){
     ifstream inFile("orders.txt"); ofstream outFile("salida.txt"); string line; int counter;
     while (getline(inFile, line)) {
@@ -179,6 +202,7 @@ int main(){
         outFile << arr[i].show() << endl;
     }
 
+    cout << "--- Primeros 10 registros por fecha ---" << endl;
     for(int i = 0; i < 10; i++){
         cout << arr[i].show() << endl;
     }
