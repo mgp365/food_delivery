@@ -68,7 +68,7 @@ void merge(T *A, int l, int m, int r){
     s1 = m - l + 1;
     s2 = r - m;
     //T L[s1], R[s2];
-    T *L = new T[s1];
+    T *L = new T[s1]; //inicializar mejor con new
     T *R = new T[s2];
     for(int i = 0; i < s1; i++) L[i] = A[l+i];
     for(int j = 0; j < s2; j++) R[j] = A[m+1+j];
@@ -170,17 +170,17 @@ int main(){
     Item arr[n];
     declare(arr);
 
-    cout << arr[0].show() << endl;
-    cout << arr[1].show() << endl;
-    cout << arr[2].show() << endl;
-    cout << arr[100].show() << endl;
-    cout << arr[9999].show() << endl;
-
+    // ordenar
     int l = 0, r = n-1;
     mergeSort(arr, l, r);
 
+    // guardar en salida.txt ordenados
     for(int i = 0; i < n; i++){
         outFile << arr[i].show() << endl;
+    }
+
+    for(int i = 0; i < 10; i++){
+        cout << arr[i].show() << endl;
     }
 
     return 0;
