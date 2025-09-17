@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <unordered_map>
 using namespace std;
 
 class Item{
@@ -8,7 +9,7 @@ class Item{
         string mes, r, o;
         int dia, hora, minuto, segundo, price;
     public:
-        Item() : mes(""), dia(0), hora(0), minuto(), segundo(), r(""), o(""), price(0) {} // constructor por defecto para evitar inicializar siempre
+        Item(): mes(""), dia(0), hora(0), minuto(0), segundo(0), r(""), o(""), price(0) {} //constructor por defecto para evitar inicializar siempre
 
         Item(string mes, int dia, int hora, int minuto, int segundo, string r, string o, int price){
             this -> mes = mes;
@@ -21,15 +22,42 @@ class Item{
             this -> price = price;
         }
         string show(){ 
-            return this -> mes + " " + to_string(this -> dia) + " " + to_string(this -> hora) + ":" + to_string(this -> minuto) + ":" + to_string(this -> segundo) + "(" + to_string(this -> price) + ")"; 
+            return this -> mes + " " + to_string(this -> dia) + " " + to_string(this -> hora) + ":" + to_string(this -> minuto) + ":" 
+            + to_string(this -> segundo) + " R:" + this -> r + + " O:" + this -> o + "(" + to_string(this -> price) + ")"; 
+        } // Dic 24 14:50:39 R:The Rustic Spoon O:Tiradito de Pescado(279) 
+
+        int num_mes() const{
+            if(this -> mes == "ene") return 1;
+            if(this -> mes == "Feb") return 2;
+            if(this -> mes == "Mar") return 3;
+            if(this -> mes == "Abr") return 4;
+            if(this -> mes == "May") return 5;
+            if(this -> mes == "Jun") return 6;
+            if(this -> mes == "Jul") return 7;
+            if(this -> mes == "Ago") return 8;
+            if(this -> mes == "Sep") return 9;
+            if(this -> mes == "Oct") return 10;
+            if(this -> mes == "Nov") return 11;
+            if(this -> mes == "Dic") return 12;
+            return 0;
+        }
+
+        long long fecha() const{
+            return (num_mes()*100000000) + (this -> dia) * 1000000 + (this -> hora) * 10000 + (this -> minuto)*100 + this -> segundo;
         }
 
         bool operator< (const Item& otro) const // & indica que no es copia, es referencia
         // los dos const son para que nunca se modifique cont ni el objeto que evoca la función
-        { return this -> price < otro.price; } // this (izq) ItemA, otro (der) itemB 
+        { return this -> fecha() < otro.fecha(); } // this (izq) ItemA, otro (der) itemB 
 
         bool operator> (const Item& otro) const
-        { return this -> price > otro.price; }
+        { return this -> fecha() > otro.fecha(); }
+
+        bool operator>= (const Item& otro) const
+        { return this -> fecha() >= otro.fecha(); }
+
+        bool operator<= (const Item& otro) const
+        { return this -> fecha() <= otro.fecha(); }
 };
 
 
@@ -39,7 +67,9 @@ void merge(T *A, int l, int m, int r){
     int s1, s2; // Tamaño de cada partición
     s1 = m - l + 1;
     s2 = r - m;
-    int L[s1], R[s2];
+    //T L[s1], R[s2];
+    T *L = new T[s1];
+    T *R = new T[s2];
     for(int i = 0; i < s1; i++) L[i] = A[l+i];
     for(int j = 0; j < s2; j++) R[j] = A[m+1+j];
 
@@ -58,7 +88,7 @@ void merge(T *A, int l, int m, int r){
 
 template<class T>
 void mergeSort(T *A, int l, int r){
-    int m;
+    int m; 
     if(l < r){
         m = l +(r-l)/2;
         mergeSort(A, l, m); mergeSort(A, m+1, r); // repetir para cada mitad
@@ -74,7 +104,7 @@ void declare(T *A){
 	int index;
 
 	ifstream inFile("orders.txt");
-    ofstream outFile("salida2.txt");
+    //ofstream outFile("salida2.txt");
 	int i = 0;
 
 	if (inFile.is_open()){	//	Lee linea a linea
@@ -127,12 +157,12 @@ void declare(T *A){
 		}
 	}
     inFile.close();
-    outFile.close();
+    //outFile.close();
 }
 
 
 int main(){
-    ifstream inFile("orders.txt"); string line; int counter;
+    ifstream inFile("orders.txt"); ofstream outFile("salida.txt"); string line; int counter;
     while (getline(inFile, line)) {
         counter++; // Incrementar el contador por cada línea leída
     }
@@ -141,6 +171,17 @@ int main(){
     declare(arr);
 
     cout << arr[0].show() << endl;
+    cout << arr[1].show() << endl;
+    cout << arr[2].show() << endl;
+    cout << arr[100].show() << endl;
+    cout << arr[9999].show() << endl;
+
+    int l = 0, r = n-1;
+    mergeSort(arr, l, r);
+
+    for(int i = 0; i < n; i++){
+        outFile << arr[i].show() << endl;
+    }
 
     return 0;
 }
