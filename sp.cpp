@@ -99,25 +99,31 @@ void mergeSort(T *A, int l, int r){
 
 // Algoritmo de búsqueda binaria
 template <class T>
-int binaria(T *A, Item s, int n){
-    int l = 0, r = n-1, i; // left y right para orientaarnos
+int binaria(T *A, Item s, int n, bool clo){
+    int l = 0, r = n-1, i, cercano; // left y right para orientaarnos
     while(l <= r){
         i = l + (r-l) / 2; // definir i como la mitad
-        if(A[i].fecha() == s) return i; 
-        else if(A[i].fecha() < s) l = i+1; // deliminar del lado izquierdo
-        else r = i-1; // delimitar de lado derecho
+        if(A[i].fecha() == s.fecha()) return i; 
+        else if(A[i].fecha() < s.fecha()){ 
+            l = i+1;
+            if(clo) cercano = i+1; 
+        }
+        else{ // delimitar de lado derecho
+            r = i-1;
+            if(!clo) cercano = i-1;
+        }
     }
-    return -1;
+    return cercano;
 }
 
 
 // declarar componentes de array según el txt
 template <class T>
-void declare(T *A){
+void declare(T *A, string archivo){
 	string sline;
 	int index;
 
-	ifstream inFile("orders.txt");
+	ifstream inFile(archivo);
     //ofstream outFile("salida2.txt");
 	int i = 0;
 
@@ -154,17 +160,28 @@ void declare(T *A){
             // Se obtiene restaurante
 			line = line.substr(index+1); // sin seg
 			index = line.find(" O:"); // aparición de :
-			string r = line.substr(0, index);
+			//string r = line.substr(0, index);
+            string r;
+            if (index == string::npos) { r = ""; } else { r = line.substr(0, index); }
 
             // Se obtiene orden
-			line = line.substr(index+3); // sin r
-			index = line.find("("); // aparición de (
-			string o = line.substr(0, index);
+            string o;
+            if(index != string::npos){
+                line = line.substr(index+3); // sin r
+			    index = line.find("("); // aparición de (
+                if(index == string::npos){ o = ""; } else{ o = line.substr(0, index); }
+            }
             
             // Se obtiene price
-			line = line.substr(index+1); // sin o
-            index = line.find(")");
-			int price = stoi(line.substr(0, index)); // (tomar el resto)
+            int price = 0; // valor por defecto
+            if(index != string::npos){
+                line = line.substr(index+1); // sin o
+			    index = line.find(")"); // aparición de )
+                if(index != string::npos){
+                    string price_str = line.substr(0, index);
+                    if(price_str != ""){ price = stoi(price_str); }
+                }
+            }
 
             // meter al arreglo
             A[i] = Item(mes, dia, hora, minuto, segundo, r, o, price); i++;
@@ -174,13 +191,45 @@ void declare(T *A){
     //outFile.close();
 }
 
-
 template <class T>
-void rango(T *A){
+void rango(T *A, int n){
     string inicio, final;
     cout << "--- Rango de fechas a buscar ---" << endl;
-    cout << "Ingrese la fecha de inicio: "; cin >> inicio;
-    cout << "Ingrese la fecha de final: "; cin >> final;
+    cout << "Ingrese la fecha de inicio: "; getline(cin, inicio);
+    cout << "Ingrese la fecha de final: "; getline(cin, final);
+
+    //guardar ambas fechas en un archivo auxiliar para reusar declare()
+    ofstream auxiliar("auxiliar.txt");
+    Item aux[2];
+    auxiliar << inicio << endl;
+    auxiliar << final << endl;
+
+    declare(aux, "auxiliar.txt"); //convertir los datos a su tipo en el array
+    auxiliar.close(); //cerrar archivo
+
+    //for(int i = 0; i < 2; i++){ //comprobar que se guardaron bien
+    //    cout << aux[i].show() << endl;
+    //}
+
+    // buscar índice del primer elemento
+    int indice1 = binaria(A, aux[0], n, true);
+    int indice2 = binaria(A, aux[1], n, false);
+    
+    // imprimir los que estén dentro del rango! :D
+    cout << "--- Órdenes en el rango seleccionado --- " << endl;
+    for(int i = indice1; i <= indice2; i++){
+        cout << A[i].show() << endl;
+    }
+
+    // ¿añadir a archivo :D?
+    cout << "--- Desea guardar lo anterior en un registro .txt? (s/n) ---" << endl;
+    string answer; cin >> answer;
+    if(answer == "s"){
+        ofstream output_fecha("ordenesPorFecha.txt");
+        for(int i = indice1; i <= indice2; i++){ output_fecha << A[i].show() << endl; }
+        cout << "El archivo ordenesPorFecha.txt ha guardado el registro" << endl;
+        cout << "Gracias por usar el programa! Que tenga un maravilloso día! :D" << endl;
+    } else cout << "Tenga un buen día :D" << endl;
 }
 
 
@@ -191,7 +240,7 @@ int main(){
     }
     const int n = counter;
     Item arr[n];
-    declare(arr);
+    declare(arr, "orders.txt");
 
     // ordenar
     int l = 0, r = n-1;
@@ -206,6 +255,8 @@ int main(){
     for(int i = 0; i < 10; i++){
         cout << arr[i].show() << endl;
     }
+
+    rango(arr, n);
 
     return 0;
 }
