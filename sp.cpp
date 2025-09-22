@@ -23,7 +23,7 @@ class Item{
         string show(){ 
             return this -> mes + " " + to_string(this -> dia) + " " + to_string(this -> hora) + ":" + to_string(this -> minuto) + ":" 
             + to_string(this -> segundo) + " R:" + this -> r + + " O:" + this -> o + "(" + to_string(this -> price) + ")"; 
-        } // Dic 24 14:50:39 R:The Rustic Spoon O:Tiradito de Pescado(279) 
+        }  
 
         int num_mes() const{
             if(this -> mes == "ene") return 1;
