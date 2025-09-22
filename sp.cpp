@@ -123,13 +123,10 @@ void declare(T *A, string archivo){
 	int index;
 
 	ifstream inFile(archivo);
-    //ofstream outFile("salida2.txt");
 	int i = 0;
 
 	if (inFile.is_open()){	//	Lee linea a linea
 		while (getline(inFile, sline)){
-            //cout << "Read:\t"<< sline << endl;
-            //outFile << sline << endl;
 
             // Se obtiene el mes: 
 			string line = sline; //pasar string auxiliar
@@ -187,7 +184,6 @@ void declare(T *A, string archivo){
 		}
 	}
     inFile.close();
-    //outFile.close();
 }
 
 template <class T>
@@ -205,10 +201,6 @@ void rango(T *A, int n){
 
     declare(aux, "auxiliar.txt"); //convertir los datos a su tipo en el array
     auxiliar.close(); //cerrar archivo
-
-    //for(int i = 0; i < 2; i++){ //comprobar que se guardaron bien
-    //    cout << aux[i].show() << endl;
-    //}
 
     // buscar índice del primer elemento
     int indice1 = binaria(A, aux[0], n, true);
